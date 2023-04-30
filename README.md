@@ -1,1 +1,1 @@
-# game-night-bot
+# Game Night Bot
