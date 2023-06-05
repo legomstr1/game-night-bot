@@ -1,11 +1,41 @@
 from venmo_api import Client
-import config
+import configparser
+from pathlib import Path
 
-# Get your access token. You will need to complete the 2FA process
-access_token = Client.get_access_token(username = config.venmo_email,
-                                       password = config.venmo_password)
-print("My token:", access_token)
+def request_money(username: str) -> bool:
+    """
+    This function sends a request to a specific Venmo user for money.
 
-venmo = Client(access_token = access_token)
+    Parameters:
+    username (str): The username of the Venmo user.
 
-venmo.payment.request_money(0.01, "test request", "disker")
+    Returns:
+    bool: True if the request was successful, False otherwise.
+    """
+    # Create a configparser object
+    config = configparser.ConfigParser()
+
+    # Formulate the path to the config file
+    config_path = Path(__file__).resolve().parent.parent / 'api_keys.config'
+    
+    # Read the configuration file
+    config.read(config_path)
+
+    # Get the access token
+    venmo_access_token = config.get('DEFAULT', 'venmo_access_token')
+    
+    # Creating a Venmo client using the access token from the config module
+    venmo = Client(access_token=venmo_access_token)
+
+    # Getting the user object from Venmo for the given username
+    user = venmo.user.get_user_by_username(username)
+
+    # Checking if the user object is not None (user exists)
+    if user is not None:
+        # Sending a request to the user for money
+        # Assuming request_money returns a boolean indicating success
+        success = venmo.payment.request_money(1, "test request", target_user=user)
+        return success
+    else:
+        print(f"User {username} not found.")
+        return False
