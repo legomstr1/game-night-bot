@@ -1,5 +1,8 @@
 #API keys
 api_keys.config
+usernames.csv
+credentials.json
+token.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -2,12 +2,13 @@ from venmo_api import Client
 import configparser
 from pathlib import Path
 
-def request_money(username: str) -> bool:
+def request_money(username: str, amount: float) -> bool:
     """
     This function sends a request to a specific Venmo user for money.
 
     Parameters:
     username (str): The username of the Venmo user.
+    amount (float): The amount to be requested.
 
     Returns:
     bool: True if the request was successful, False otherwise.
@@ -34,7 +35,7 @@ def request_money(username: str) -> bool:
     if user is not None:
         # Sending a request to the user for money
         # Assuming request_money returns a boolean indicating success
-        success = venmo.payment.request_money(1, "test request", target_user=user)
+        success = venmo.payment.request_money(amount, "test request", target_user=user)
         return success
     else:
         print(f"User {username} not found.")
