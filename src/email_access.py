@@ -46,7 +46,7 @@ def main():
             print('No new emails.')
         else:
             print('Emails:')
-            message = messages[0]  # Get the first (most recent) email
+            message = messages[2]  # Get the first (most recent) email
             msg = service.users().messages().get(userId='me', id=message['id']).execute()  # Fetch the message using the API
             payload = msg['payload']
             headers = payload['headers']
@@ -64,12 +64,10 @@ def main():
             body = payload.get('body', {}).get('data')
             if body is not None:
                 text = base64.urlsafe_b64decode(body).decode()
-                #print('Message: ', text)
             else:
                 print("No body in the email's payload.")
             print()
-            print()
-            order_parser.parse_order(text)
+            order_parser.print_order(order_parser.parse_order(text))
 
     except HttpError as error:
         # TODO(developer) - Handle errors from gmail API.
