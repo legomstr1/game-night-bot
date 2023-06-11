@@ -72,11 +72,13 @@ def get_order():
                     subject = d['value']
                 if d['name'] == 'From':
                     sender = d['value']
+                if d['name'] == 'Date':
+                    date = d['value']
             
             body = payload.get('body', {}).get('data')
             text = base64.urlsafe_b64decode(body).decode() if body else None
 
-            message_dict = {'subject':subject, 'sender':sender, 'body':text}
+            message_dict = {'subject':subject, 'sender':sender, 'date':date, 'body':text}
             return message_dict
     
     except HttpError as error:

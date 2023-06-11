@@ -30,15 +30,11 @@ def parse_order(html_string: str):
         if quantity and name and price_text:
             detail = [subitem.strip(' •\xa0') for subitem in name[1:] if subitem.strip(' •\xa0')]
             name = name[0].strip()
-            quantity = quantity[0].strip()
+            quantity = int(quantity[0].strip())
             price_text = ' '.join(price_text)
 
             # Extract price using regular expression
-            price = re.search(r'\$\d+(\.\d{2})?', price_text)
-            if price:
-                price = price.group()
-            else:
-                continue  # If no price is found, skip this item
+            price = float(re.search(r'\$(\d+(\.\d{2})?)', price_text).group(1))
 
             # Store the item details in items_ordered list
             items_ordered.append({
@@ -79,7 +75,7 @@ def print_order(order):
         print(f"Item {idx}:")
         print(f"  Name: {item['name']}")
         print(f"  Quantity: {item['quantity']}")
-        print(f"  Price: {item['price']}")
+        print(f"  Price: ${item['price']:.2f}")
         
         # Check if 'detail' exists and is not empty
         if 'detail' in item and item['detail']:
