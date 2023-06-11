@@ -67,34 +67,9 @@ def main():
                 #print('Message: ', text)
             else:
                 print("No body in the email's payload.")
-
-            match = re.search(r'Total: \$([\d\.]+)', text)
-            
-            if match:
-                total = match.group(1)
-                print(total)
-            else:
-                print('No match found')
-
-            match = re.search(r'Items subtotal.*?\$([\d\.]+)', text)
-
-            if match:
-                subtotal = match.group(1)
-                print(subtotal)
-            else:
-                print('No match found')
-
-            pattern = r'<td[^>]*>(.*?)<\/td>'  # Matches <td>...</td> tags and captures the content inside
-            matches = re.findall(pattern, text)
-
-            # Cleaning the extracted matches
-            item = re.sub(r'<.*?>', '', matches[1])  # Extracted item (second match)
-            cost = re.sub(r'<.*?>', '', matches[2])  # Extracted cost (third match)
-
-            print("Item:", item.strip())
-            print("Cost:", cost.strip())
-
-            print("Multiplier: " + str(float(total)/float(subtotal)))
+            print()
+            print()
+            order_parser.parse_order(text)
 
     except HttpError as error:
         # TODO(developer) - Handle errors from gmail API.
