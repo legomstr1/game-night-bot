@@ -1,4 +1,5 @@
-# Game Night Bot
+# S.T.A.R
+## Smart Tool to Assist Recreation
 
 This is an open source discord bot.
 ### Currently Functionality:
