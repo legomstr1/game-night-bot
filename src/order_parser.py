@@ -46,10 +46,15 @@ def parse_order(html_string: str):
 
     # Extract subtotal, service fee, sales tax, tip, and total charge using XPath
     subtotal = root.xpath('//td[contains(text(), "Items subtotal")]/following-sibling::td/text()')
+    subtotal = float(subtotal[0].replace("$", ""))
     service_fee = root.xpath('//td[contains(text(), "Service fee")]/following-sibling::td/text()')
+    service_fee = float(service_fee[0].replace("$", ""))
     sales_tax = root.xpath('//td[contains(text(), "Sales tax")]/following-sibling::td/text()')
+    sales_tax = float(sales_tax[0].replace("$", ""))
     tip = root.xpath('//td[contains(text(), "Tip")]/following-sibling::td/text()')
+    tip = float(tip[0].replace("$", ""))
     total_charge = root.xpath('//td[contains(text(), "Total charge")]/following-sibling::td/b/text()')
+    total_charge = float(total_charge[0].replace("$", ""))
 
     # Prepare the final order dictionary
     order = {
@@ -84,8 +89,8 @@ def print_order(order):
             print("  Detail: None")
         print()
 
-    print(f"Subtotal: {order['subtotal'][0] if order['subtotal'] else 'N/A'}")
-    print(f"Service Fee: {order['fee'][0] if order['fee'] else 'N/A'}")
-    print(f"Sales Tax: {order['tax'][0] if order['tax'] else 'N/A'}")
-    print(f"Tip: {order['tip'][0] if order['tip'] else 'N/A'}")
-    print(f"Total Charge: {order['total'][0] if order['total'] else 'N/A'}")
+    print(f"Subtotal: ${order['subtotal']:.2f}")
+    print(f"Service Fee: ${order['fee']:.2f}")
+    print(f"Sales Tax: ${order['tax']:.2f}")
+    print(f"Tip: ${order['tip']:.2f}")
+    print(f"Total Charge: ${order['total']:.2f}")
