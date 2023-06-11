@@ -40,3 +40,6 @@ def request_money(username: str, amount: float) -> bool:
     else:
         print(f"User {username} not found.")
         return False
+    
+def is_valid_username(username: str) -> bool:
+    pass

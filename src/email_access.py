@@ -2,7 +2,6 @@ from __future__ import print_function
 import base64
 import re
 import os.path
-import order_parser
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -10,13 +9,13 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+# Constants
+EMAIL_ADRESSES = ["orders@eat.grubhub.com", "orders@doordash.com", "orders@ubereats.com"]
+
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
-def main():
-    """Shows basic usage of the Gmail API.
-    Lists the user's Gmail labels.
-    """
+def get_user_creds():
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -34,18 +33,20 @@ def main():
         # Save the credentials for the next run
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
+    return creds
 
+def get_order():
+    creds = get_user_creds()
     try:
         # Call the Gmail API
         service = build('gmail', 'v1', credentials=creds)
         # Get the list of all emails
-        results = service.users().messages().list(userId='me', q="from:orders@eat.grubhub.com").execute()
+        query = " OR ".join(f"from:{email}" for email in EMAIL_ADRESSES)
+        results = service.users().messages().list(userId='me', q=query).execute()
         messages = results.get('messages', [])
-
         if not messages:
-            print('No new emails.')
+            return None
         else:
-            print('Emails:')
             message = messages[2]  # Get the first (most recent) email
             msg = service.users().messages().get(userId='me', id=message['id']).execute()  # Fetch the message using the API
             payload = msg['payload']
@@ -56,23 +57,16 @@ def main():
                     subject = d['value']
                 if d['name'] == 'From':
                     sender = d['value']
-
-            print('Latest email from github.com')
-            print('Subject: ', subject)
-            print('Sender: ', sender)
-
+            
             body = payload.get('body', {}).get('data')
             if body is not None:
                 text = base64.urlsafe_b64decode(body).decode()
             else:
-                print("No body in the email's payload.")
-            print()
-            order_parser.print_order(order_parser.parse_order(text))
+                text = None
 
+            message_dict = {'subject':subject, 'sender':sender, 'body':text}
+            return message_dict
+    
     except HttpError as error:
         # TODO(developer) - Handle errors from gmail API.
         print(f'An error occurred: {error}')
-
-
-if __name__ == '__main__':
-    main()

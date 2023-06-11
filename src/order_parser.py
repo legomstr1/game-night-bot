@@ -2,7 +2,7 @@ import re
 from lxml import html
 
 
-def parse_order(html_string):
+def parse_order(html_string: str):
     """
     Function to parse an HTML string containing order details.
     It extracts items ordered, their quantities, names, and prices.
