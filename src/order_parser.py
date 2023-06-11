@@ -1,6 +1,34 @@
 import re
 from lxml import html
 
+def extract_amount(root, label):
+    """
+    Extract a dollar amount related to a particular label from an HTML tree.
+
+    Parameters:
+    root (lxml.html.HtmlElement): The root of the HTML tree.
+    label (str): The label of the value to extract.
+
+    Returns:
+    float: The extracted dollar amount, or None if not found.
+    """
+    
+    # Create the XPath query string.
+    xpath_query = f'//td[contains(text(), "{label}")]/following-sibling::td//text()'
+
+    # Execute the XPath query.
+    text_results = root.xpath(xpath_query)
+
+    # Iterate over the results.
+    for text in text_results:
+        # If a dollar sign is found, this is the correct text.
+        if "$" in text:
+            # Remove the dollar sign and whitespace, then convert to float.
+            amount = text.replace("$", "").strip()
+            return float(amount)
+
+    # If no text contained a dollar sign, return None.
+    return None
 
 def parse_order(html_string: str):
     """
@@ -44,26 +72,20 @@ def parse_order(html_string: str):
                 'price': price,
             })
 
-    # Extract subtotal, service fee, sales tax, tip, and total charge using XPath
-    subtotal = root.xpath('//td[contains(text(), "Items subtotal")]/following-sibling::td/text()')
-    subtotal = float(subtotal[0].replace("$", ""))
-    service_fee = root.xpath('//td[contains(text(), "Service fee")]/following-sibling::td/text()')
-    service_fee = float(service_fee[0].replace("$", ""))
-    sales_tax = root.xpath('//td[contains(text(), "Sales tax")]/following-sibling::td/text()')
-    sales_tax = float(sales_tax[0].replace("$", ""))
-    tip = root.xpath('//td[contains(text(), "Tip")]/following-sibling::td/text()')
-    tip = float(tip[0].replace("$", ""))
-    total_charge = root.xpath('//td[contains(text(), "Total charge")]/following-sibling::td/b/text()')
-    total_charge = float(total_charge[0].replace("$", ""))
+    labels = ["Items subtotal", "Service fee", "Sales tax", "Tip", "Total charge"]
+    # Use a dictionary comprehension to store the results in a dictionary
+    # Keyed by the label for easy access.
+    amounts = {label: extract_amount(root, label) for label in labels}
+
 
     # Prepare the final order dictionary
     order = {
         'items': items_ordered,
-        'subtotal': subtotal,
-        'fee': service_fee,
-        'tax': sales_tax,
-        'tip': tip,
-        'total': total_charge
+        'subtotal': amounts['Items subtotal'],
+        'fee': amounts['Service fee'],
+        'tax': amounts['Sales tax'],
+        'tip': amounts['Tip'],
+        'total': amounts['Total charge']
     }
 
     return order
