@@ -5,12 +5,25 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from order_parser import order
 import re
+from enum import Enum
 load_dotenv()
 TOKEN = os.getenv('TOKEN')
 bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 test_channel = 1117516004709367878
 client = discord.Client(intents=discord.Intents.all())
 
+emoji_mapping = {
+    1:'1️⃣',
+    2:'2️⃣',
+    3:'3️⃣',
+    4:'4️⃣',
+    5:'5️⃣',
+    6:'6️⃣',
+    7:'7️⃣',
+    8:'8️⃣',
+    9:'9️⃣',
+    10:'🔟',
+}
 
 @bot.event
 async def on_ready():
@@ -24,17 +37,20 @@ async def hi(ctx):
 
 @bot.command()
 async def who_got_what(ctx):
+    i=1
     for item in order["items"]:
         meal = item["name"], item["detail"]
         print(item["name"], item["detail"])
-        await ctx.send(meal)
+        sent = await ctx.send(meal)
+        await sent.add_reaction(emoji_mapping[i])
+        i = i + 1
 
 
-@client.event
-async def on_reaction_add(reaction, user):
+@bot.event
+async def send_reaction(ctx, message):
     print("flag")
-    await reaction.send("flag")
-    
+
+
 
 '''
 @client.event
