@@ -38,12 +38,17 @@ async def hi(ctx):
 @bot.command()
 async def who_got_what(ctx):
     i=1
+    message = ""
     for item in order["items"]:
-        meal = item["name"], item["detail"]
-        print(item["name"], item["detail"])
-        sent = await ctx.send(meal)
+        #print(' '.join(item["detail"]))
+        details = " ".join(item["detail"])
+        print(item["name"], details)
+        message += (item["name"] + ": " + details + emoji_mapping[i] + " \n")
+        i= i+1
+    sent = await ctx.send(message)
+    for item in order["items"]:
         await sent.add_reaction(emoji_mapping[i])
-        i = i + 1
+        i = i+1
 
 
 @bot.event
