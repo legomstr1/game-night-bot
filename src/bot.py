@@ -11,7 +11,6 @@ TOKEN = os.getenv('TOKEN')
 bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 test_channel = 1117516004709367878
 client = discord.Client(intents=discord.Intents.all())
-
 emoji_mapping = {
     1:'1️⃣',
     2:'2️⃣',
@@ -23,6 +22,18 @@ emoji_mapping = {
     8:'8️⃣',
     9:'9️⃣',
     10:'🔟',
+}
+emoji_unmapping = {
+    '1️⃣':1,
+    '2️⃣':2,
+    '3️⃣':3,
+    '4️⃣':4,
+    '5️⃣':5,
+    '6️⃣':6,
+    '7️⃣':7,
+    '8️⃣':8,
+    '9️⃣':9,
+    '🔟':10,
 }
 
 @bot.event
@@ -39,21 +50,29 @@ async def hi(ctx):
 async def who_got_what(ctx):
     i=1
     message = ""
-    for item in order["items"]:
+    for item in order["items"]:#builds a message from all the items names+deetails fromt eh order dict in order_parser.py
         #print(' '.join(item["detail"]))
         details = " ".join(item["detail"])
         print(item["name"], details)
         message += (item["name"] + ": " + details + emoji_mapping[i] + " \n")
         i= i+1
+    i=1
     sent = await ctx.send(message)
-    for item in order["items"]:
+    global oder_message
+    oder_message = sent.id
+    for item in order["items"]:#adds a reaction for each item in the oder (currently maxes at 10 items)
         await sent.add_reaction(emoji_mapping[i])
         i = i+1
 
 
 @bot.event
-async def send_reaction(ctx, message):
+async def on_reaction_add(reaction, user):
+    if user == bot.user:
+        return
     print("flag")
+    await user.send("you ordered: " + order["items"][(emoji_unmapping[reaction.emoji])-1]["name"])
+    print(user)
+
 
 
 
