@@ -116,3 +116,50 @@ def print_order(order):
     print(f"Sales Tax: ${order['tax']:.2f}")
     print(f"Tip: ${order['tip']:.2f}")
     print(f"Total Charge: ${order['total']:.2f}")
+
+
+##################################################################################
+quantity = int(1)
+name = str("rogan josh")
+detail = ["mild, extra josh"]
+price = float(10.50)
+
+quantity2 = int(2)
+name2 = str("lamb")
+detail2 = ["spicy, hold the rogan"]
+price2 = float(23.50)
+
+# This dictionary represents an item in an order. 
+# It includes information about the quantity ordered, the name of the item, any additional details, and the price of the item.
+
+
+food = {
+    'quantity': quantity,  # Int. The number of units of this item that were ordered.
+    'name': name,  # String. The name of the item.
+    'detail': detail,  # List of strings. Additional details about the item. For example, this might include specifications for a product, or special instructions for a food order.
+    'price': price,  # Float. The price of a single unit of this item.
+}
+
+food2 = {
+    'quantity': quantity2,  # Int. The number of units of this item that were ordered.
+    'name': name2,  # String. The name of the item.
+    'detail': detail2,  # List of strings. Additional details about the item. For example, this might include specifications for a product, or special instructions for a food order.
+    'price': price2,  # Float. The price of a single unit of this item.
+}
+
+item = [food, food2 ]
+
+subtotal = float(50.50)
+service_fee = float(5.30)
+sales_tax = float(8.80)
+tip = float(10.20)
+total_charge = float(100)
+
+for_testing = {
+    'items': item,  # A list of dictionaries, where each dictionary represents an item. See the 'item' dictionary below.
+    'subtotal': subtotal,  # Float. The total cost of the items ordered before any fees, taxes, or tips.
+    'fee': service_fee,  # Float. The service fee charged on the order.
+    'tax': sales_tax,  # Float. The sales tax charged on the order.
+    'tip': tip,  # Float. The tip given by the customer.
+    'total': total_charge  # Float. The total charge to the customer, including items, fees, taxes, and tip.
+}

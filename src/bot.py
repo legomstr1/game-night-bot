@@ -3,7 +3,7 @@ import os
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-from order_parser import order
+from order_parser import for_testing as order
 import re
 from enum import Enum
 load_dotenv()
