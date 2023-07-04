@@ -72,9 +72,22 @@ async def who_got_what(ctx):
 async def on_reaction_add(reaction, user):
     if user == bot.user:#prevent bot from triggering event
         return
+    if reaction.message.author != bot.user:
+        return
     print("flag")
     item_name = order["items"][(emoji_unmapping[reaction.emoji])-1]["name"]#get the item the user ordered
-    item_price = order["items"][(emoji_unmapping[reaction.emoji])-1]["price"]#get the price of that item
+
+    #get the amount
+    my_price = order["items"][(emoji_unmapping[reaction.emoji])-1]["price"]
+    subtotal = order["subtotal"]
+    my_portion = my_price/subtotal
+    my_tip = round(my_portion*order["tip"], 2)
+    my_fee = round(my_portion*order["fee"], 2)
+    my_total = round( (my_price*.0625) + my_tip + my_fee, 2)#get the price of that item + tax + tip + fee
+    print(my_price)
+    print(my_tip)
+    print(my_fee)
+    print(my_total)
     await user.send("you ordered: " + item_name)#tell the user what they ordered
     print(user)
 
@@ -83,7 +96,7 @@ async def on_reaction_add(reaction, user):
     # returns JSON object as a dictionary
     names_dict = json.load(f)
     if(str(user) in names_dict):        
-        if(venmo.request_money(names_dict[str(user)], item_price)):
+        if(venmo.request_money(names_dict[str(user)], my_total)):
             await user.send("Venmo payment for "+ item_name + " has been sent")
         else:
             await user.send("the username we have on file for you is invalid please contact your admin")
@@ -91,11 +104,11 @@ async def on_reaction_add(reaction, user):
             await user.send("we don't have your venmo username on file please use the !vname {venmo username} and rereact to the food item")
 
 @bot.command()
-async def vname(ctx, arg):
+async def vname(ctx, arg):#adds the discord users venmo name keyed to their discord user ID and saves it to the JSON file
     f = open('venmo_names.JSON')# Opening JSON file
     # returns JSON object as a dictionary
     names_dict = json.load(f)
-    if(arg not in names_dict):
+    if(arg not in names_dict):#checks if we have their venmo name
         names_dict[str(ctx.author)] = str(arg)
         print(ctx.author)
         print(" was added with the venmo anme ")
