@@ -8,6 +8,7 @@ import re
 from enum import Enum
 import venmo
 import json
+import asyncio
 
 load_dotenv()
 TOKEN = os.getenv('TOKEN')
@@ -42,8 +43,8 @@ emoji_unmapping = {
 @bot.event
 async def on_ready():
     print("hello world")
-#    channel = bot.get_channel(test_channel)
-#    await channel.send("hello world")
+    #channel = bot.get_channel(test_channel)
+    #await channel.send("Happy 4th of July")
 
 @bot.command()
 async def hi(ctx):
@@ -99,7 +100,7 @@ async def on_reaction_add(reaction, user):
         if(venmo.request_money(names_dict[str(user)], my_total)):
             await user.send("Venmo payment for "+ item_name + " has been sent")
         else:
-            await user.send("the username we have on file for you is invalid please contact your admin")
+            await user.send("the username we have on file for you is invalid please re-run !vname {venmo username}")
     else:
             await user.send("we don't have your venmo username on file please use the !vname {venmo username} and rereact to the food item")
 
@@ -108,18 +109,35 @@ async def vname(ctx, arg):#adds the discord users venmo name keyed to their disc
     f = open('venmo_names.JSON')# Opening JSON file
     # returns JSON object as a dictionary
     names_dict = json.load(f)
-    if(arg not in names_dict):#checks if we have their venmo name
-        names_dict[str(ctx.author)] = str(arg)
-        print(ctx.author)
-        print(" was added with the venmo anme ")
-        print(arg)
-        print(names_dict)
-        with open("venmo_names.json", "w") as f:
-            json.dump(names_dict, f)
-    else:
-        print("name already in dictionary ")
-   
+    names_dict[str(ctx.author)] = str(arg)
+    print(ctx.author)
+    print(" was added with the venmo anme ")
+    print(arg)
+    print(names_dict)
+    with open("venmo_names.json", "w") as f:
+        json.dump(names_dict, f)
+
+@bot.command()
+async def check_if_group_order(ctx, owner_id = 241376328278999041):#DMs Grubhub owner if this is a group meal
+    user = await bot.fetch_user(owner_id)
+    await user.send("Is the most recent Grubhub order a group Meal")
+    def check(m):
+        return m.author.id == owner_id and m.content.lower() in ['yes', 'no']
     
+    try:
+        response = await bot.wait_for('message', check=check, timeout=60)  # Waits for 60 seconds for the response
+        await ctx.send(f"{user.name} answered: {response.content.lower()}")
+    except asyncio.TimeoutError:
+        await user.send(f"Sorry, you took too long to respond. Run !check_if_group_order to be prompted again" )
+
+    if response.content.lower() == "yes":#invoke the who got what
+        command = bot.get_command('who_got_what')  # Get the command object for !hi
+        if command:
+            channel = bot.get_channel(test_channel)
+            if channel:
+                ctx.channel = channel
+                ctx.command = command  # Set the command in the context
+                await bot.invoke(ctx)  # Invoke the !hi command
 
 
 '''
