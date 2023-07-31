@@ -122,12 +122,12 @@ def print_order(order):
 quantity = int(1)
 name = str("rogan josh")
 detail = ["mild, extra josh"]
-price = float(0.01)
+price = float(8.60)
 
 quantity2 = int(2)
 name2 = str("lamb")
 detail2 = ["spicy, hold the rogan"]
-price2 = float(0.50)
+price2 = float(10.50)
 
 # This dictionary represents an item in an order. 
 # It includes information about the quantity ordered, the name of the item, any additional details, and the price of the item.
@@ -149,7 +149,7 @@ food2 = {
 
 item = [food, food2 ]
 
-subtotal = float(50.50)
+subtotal = float(20.50)
 service_fee = float(5.30)
 sales_tax = float(8.80)
 tip = float(10.20)
