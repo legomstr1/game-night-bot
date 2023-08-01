@@ -30,7 +30,10 @@ def extract_amount(root, label):
     # If no text contained a dollar sign, return None.
     return None
 
-def parse_order(html_string: str):
+def email_to_order(email:dict) -> dict:
+    if email['sender'] == "Grubhub <orders@eat.grubhub.com>":
+        return parse_grubhub(email['body'])
+def parse_grubhub(html_string: str) -> dict:
     """
     Function to parse an HTML string containing order details.
     It extracts items ordered, their quantities, names, and prices.
