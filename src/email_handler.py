@@ -1,5 +1,6 @@
 # Import necessary modules
 from __future__ import print_function
+from typing import Optional
 import base64
 import os.path
 
@@ -38,8 +39,21 @@ def get_user_creds():
             token.write(creds.to_json())
     return creds
 
+def is_new_order(old_email:dict) -> (bool, dict):
+    """ Checks if there is a new order by comparing the date of the last retrieved order with the previous one.
+    
+    Args:
+        old_email (dict): The previously retrieved order.
+    
+    Returns:
+        bool: True if the new order's date is different from the old one, False otherwise.
+        dict: The newly retrieved order.
+    """
+    new_email = get_order()
+    return new_email['date'] != old_email['date'], new_email
+
 def get_order():
-    """Fetches the most recent order from specified email addresses. 
+    """ Fetches the most recent order from specified email addresses. 
     Returns a dictionary with the subject, sender, and body of the message."""
 
     creds = get_user_creds()  # Get user credentials
