@@ -96,13 +96,36 @@ async def on_reaction_add(reaction, user):
     f = open('venmo_names.JSON')# Opening JSON file
     # returns JSON object as a dictionary
     names_dict = json.load(f)
-    if(str(user) in names_dict):        
+    if(str(user) in names_dict):
         if(venmo.request_money(names_dict[str(user)], my_total)):
             await user.send("Venmo payment for "+ item_name + " has been sent")
         else:
-            await user.send("the username we have on file for you is invalid please re-run !vname {venmo username}")
+            await user.send("the username we have on file for you is invalid please re-run !vname {venmo username} ensure proper casing")
     else:
-            await user.send("we don't have your venmo username on file please use the !vname {venmo username} and rereact to the food item")
+        await user.send("we don't have your venmo username on file please what is you venmo username (ensure proper casing) and rereact to the food item again")
+        ctx = await bot.get_context(reaction.message)
+        ctx.command = bot.get_command("vname")
+        ctx.author = user
+            
+        def check(m):
+            return m.content.lower()
+        try:
+            response = await bot.wait_for('message', check=check, timeout=60)  # Waits for 60 seconds for the response
+            print(response.content.lower())
+        except asyncio.TimeoutError:
+            await user.send(f"Sorry, you took too long to respond. Run !check_if_group_order to be prompted again" )
+        print("invoking vname")
+        await vname(ctx, response.content)
+        f = open('venmo_names.JSON')
+        names_dict = json.load(f)
+        if(str(user) in names_dict):
+            if(venmo.request_money(names_dict[str(user)], my_total)):
+                await user.send("Venmo payment for "+ item_name + " has been sent")
+            else:
+                await user.send("the username we have on file for you is invalid please re-run !vname {venmo username} ensure proper casing")
+        else:
+            print("flag")
+            print(names_dict)
 
 @bot.command()
 async def vname(ctx, arg):#adds the discord users venmo name keyed to their discord user ID and saves it to the JSON file
@@ -122,7 +145,7 @@ async def check_if_group_order(ctx, owner_id = 241376328278999041):#DMs Grubhub 
     user = await bot.fetch_user(owner_id)
     await user.send("Is the most recent Grubhub order a group Meal")
     def check(m):
-        return m.author.id == owner_id and m.content.lower() in ['yes', 'no']
+        return m.author.id == owner_id and m.content.lower()
     
     try:
         response = await bot.wait_for('message', check=check, timeout=60)  # Waits for 60 seconds for the response
@@ -132,12 +155,10 @@ async def check_if_group_order(ctx, owner_id = 241376328278999041):#DMs Grubhub 
 
     if response.content.lower() == "yes":#invoke the who got what
         command = bot.get_command('who_got_what')  # Get the command object for !hi
-        if command:
-            channel = bot.get_channel(test_channel)
-            if channel:
-                ctx.channel = channel
-                ctx.command = command  # Set the command in the context
-                await bot.invoke(ctx)  # Invoke the !hi command
+        channel = bot.get_channel(test_channel)
+        ctx.channel = channel
+        ctx.command = command  # Set the command in the context
+        await bot.invoke(ctx)  # Invoke the !hi command
 
 
 '''
